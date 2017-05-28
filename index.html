@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title></title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    </head>
+	<body>
+	<div><h2>Twitter Archive</h2></div>
+	<button id="tweets">View all tweets</button>
+	<button id="users">View all users</button>
+	<button id="external_urls">View all external URLs</button>
+	<div id="div1"></div>
+	</body>
+
+	<script type="text/javascript">
+	    $(document).ready(function () {
+	        $("#tweets").click(function () {
+	            $.getJSON('/tweets', function(data) { 
+					$("#div1").empty();
+					$("#div1").append("<ul>");
+					var items = [];
+					$.each(data, function (key, val) {
+						items.push( "<li id='" + key + "'>" + val + " <font color=blue><a href='#' onclick='javascript:tweet(" + key + ")'>Details</a></font></li>");
+					})
+					$("#div1").append(items);
+					$("#div1").append("</ul>");
+				});
+	        });
+			
+			$("#users").click(function() {
+				$.getJSON('/users', function(data) {
+					$("#div1").empty();
+					$("#div1").append("<ul>");
+					for (i = 0; i < data['users'].length; i++) {
+						$("#div1").append("<li id='" + data['users'][i] + "'><a href='#' onclick='javascript:user(\"" + data['users'][i] + "\")'>" + data['users'][i] + "</a></li>");
+					}
+
+					$("#div1").append("</ul>");
+				})
+			});
+			
+			$("#external_urls").click(function() {
+				$.getJSON('/external_urls', function(data) {
+					$("#div1").empty();
+					$("#div1").append("<ul>");
+					for (i = 0; i < data['external_urls'].length; i++) {
+						$("#div1").append("<li><a href='" + data['external_urls'][i] + "' target='_blank'>" + data['external_urls'][i] + "</a></li>");
+					}
+					$("#div1").append("</ul>");
+				})
+			});
+		    
+	    });
+		
+		function tweet(id) {
+			var jsonurl = '/tweet/' + id;
+				$.getJSON(jsonurl, function(data) {
+					var divid = "#" + id;
+					$(divid).append("<h5>Created at: " + data['created_at'] + "</h5>");
+					$(divid).append("<h5>Name: " + data['name'] + "</h5>");
+					$(divid).append("<h5>Screen name: " + data['screen_name'] + "</h5>");
+				});
+		}
+		
+		function user(screen_name) {
+			var jsonurl = '/user/' + screen_name;
+			$.getJSON(jsonurl, function(data) {
+				var divid = "#" + screen_name;
+				$(divid).append("<h5>ID: " + data['id'] + "</h5>");
+				$(divid).append("<h5>Name: " + data['name'] + "</h5>");
+				$(divid).append("<h5>Location: " + data['location'] + "</h5>");
+				$(divid).append("<h5>Description: " + data['description'] + "</h5>");
+			});
+		}
+	</script>
+	</html>
